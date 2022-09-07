@@ -21,7 +21,7 @@ public class CategoriaServiceImpl implements ICategoriaService{
 	
 	private static final Logger log = LoggerFactory.getLogger(CategoriaServiceImpl.class);
 	@Autowired
-	private ICategoriaDao catergoriaDao;
+	private ICategoriaDao categoriaDao;
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -29,7 +29,7 @@ public class CategoriaServiceImpl implements ICategoriaService{
 		log.info("Inicio del método buscarCategorias()");
 		CategoriaResponseRest response = new CategoriaResponseRest();
 		try {
-			List<Categoria> categoria = (List<Categoria>) catergoriaDao.findAll();
+			List<Categoria> categoria = (List<Categoria>) categoriaDao.findAll();
 			response.getCategoriaResponse().setCategorias(categoria);
 			response.setMetadata("Respuesta OK", "00", "Respuesta exitoss");
 		} catch (Exception e) {
@@ -38,6 +38,7 @@ public class CategoriaServiceImpl implements ICategoriaService{
 			e.getStackTrace();
 			return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		response.setMetadata("Respuesta OK", "00", "Respuesta exitosa");
 		return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.OK);
 	}
 
@@ -48,7 +49,7 @@ public class CategoriaServiceImpl implements ICategoriaService{
 		CategoriaResponseRest response = new CategoriaResponseRest();
 		List<Categoria> list = new ArrayList<>();
 		try {
-			Optional<Categoria> categoria = catergoriaDao.findById(id);
+			Optional<Categoria> categoria = categoriaDao.findById(id);
 			if(categoria.isPresent()) {
 				list.add(categoria.get());
 				response.getCategoriaResponse().setCategorias(list);
@@ -64,6 +65,33 @@ public class CategoriaServiceImpl implements ICategoriaService{
 			response.setMetadata("Respuesta no OK", "-1", "Error al consultar categoría");
 			return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		response.setMetadata("Respuesta OK", "00", "Respuesta exitosa");
+		return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.OK);
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<CategoriaResponseRest> crear(Categoria categoria) {
+		log.info("Inicio de método crear()");
+		CategoriaResponseRest response = new CategoriaResponseRest();
+		List<Categoria> list = new ArrayList<>();
+		try {
+			Categoria categoriaCreada = categoriaDao.save(categoria);
+			if(categoriaCreada != null) {
+				list.add(categoriaCreada);
+				response.getCategoriaResponse().setCategorias(list);
+			}
+			else {
+				log.error("Error en crear la categoria");
+				response.setMetadata("Respuesta no OK", "-1", "Categoria no creada");
+				return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			log.error("Error en crear una categoria");
+			response.setMetadata("Respuesta no OK", "-1", "Error al crear categoría");
+			return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		response.setMetadata("Respuesta OK", "00", "Respuesta exitosa");
 		return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.OK);
 	}
 
