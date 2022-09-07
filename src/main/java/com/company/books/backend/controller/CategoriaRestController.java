@@ -34,5 +34,9 @@ public class CategoriaRestController {
 		ResponseEntity<CategoriaResponseRest> response = service.crear(request);
 		return response;
 	}
-	
+	@PutMapping("/categorias/{id}")
+	public ResponseEntity<CategoriaResponseRest> actualizarCategoria(@RequestBody Categoria request, @PathVariable Long id ){
+		ResponseEntity<CategoriaResponseRest> response = service.actualizar(request, id);
+		return response;
+	}
 }

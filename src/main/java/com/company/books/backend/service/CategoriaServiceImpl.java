@@ -95,4 +95,43 @@ public class CategoriaServiceImpl implements ICategoriaService{
 		return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.OK);
 	}
 
+	@Transactional
+	@Override
+	public ResponseEntity<CategoriaResponseRest> actualizar(Categoria categoria, Long id) {
+		log.info("Inicio del método actualizar");
+		CategoriaResponseRest response = new CategoriaResponseRest();
+		List<Categoria> list = new ArrayList<>();
+		try {
+			Optional<Categoria> categoriaAActualizar = categoriaDao.findById(id);
+			if(categoriaAActualizar.isPresent() ) {
+				categoriaAActualizar.get().setNombre(categoria.getNombre());
+				categoriaAActualizar.get().setDescripcion(categoria.getDescripcion());
+				Categoria categoriaActualizada = categoriaDao.save(categoriaAActualizar.get());
+				if( categoriaActualizada != null) {
+					response.setMetadata("Respuesta OK", "00", "Categoria Actualizada");
+					list.add(categoriaActualizada);
+					response.getCategoriaResponse().setCategorias(list);
+				}
+				else {
+					log.error(("Error en actualizar categoria"));
+					response.setMetadata("Respuesta no OK", "00", "Categoria no actualizada");
+					return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.BAD_REQUEST);
+					
+				}
+			}
+			else {
+				log.error(("Error en actualizar categoria"));
+				response.setMetadata("Respuesta no OK", "00", "Categoria no actualizada");
+				return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			log.error("Error en actualizar categoria", e.getMessage());
+			e.getStackTrace();
+			response.setMetadata("Respuesta no OK", "00", "Categoria no actualizada");
+			return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		response.setMetadata("Respuesta Ok", "00", "Categoria Actualizada");
+		return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.OK);
+	}
+
 }
