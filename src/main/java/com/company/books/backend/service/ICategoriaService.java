@@ -1,7 +1,10 @@
 package com.company.books.backend.service;
 
+import org.springframework.http.ResponseEntity;
+
 import com.company.books.backend.response.CategoriaResponseRest;
 
 public interface ICategoriaService {
-	public CategoriaResponseRest buscarCategorias();
+	public ResponseEntity<CategoriaResponseRest> buscarCategorias();
+	public ResponseEntity<CategoriaResponseRest> buscarPorId(Long id);
 }

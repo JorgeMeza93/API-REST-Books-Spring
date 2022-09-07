@@ -1,6 +1,8 @@
 package com.company.books.backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,7 @@ public class CategoriaServiceImpl implements ICategoriaService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public CategoriaResponseRest buscarCategorias() {
+	public ResponseEntity<CategoriaResponseRest> buscarCategorias() {
 		log.info("Inicio del método buscarCategorias()");
 		CategoriaResponseRest response = new CategoriaResponseRest();
 		try {
@@ -31,11 +33,38 @@ public class CategoriaServiceImpl implements ICategoriaService{
 			response.getCategoriaResponse().setCategorias(categoria);
 			response.setMetadata("Respuesta OK", "00", "Respuesta exitoss");
 		} catch (Exception e) {
-			response.setMetadata("Respuesta no ok", "-1", "Respuesta Incorrecta");
+			response.setMetadata("Respuesta no ok", "-1", "Error al consultar categorías");
 			log.error("Error al consultar categorías", e.getMessage());
 			e.getStackTrace();
+			return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return response; // devuelve 200
+		return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.OK);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ResponseEntity<CategoriaResponseRest> buscarPorId(Long id) {
+		log.info("Inicio de método buscarPorId");
+		CategoriaResponseRest response = new CategoriaResponseRest();
+		List<Categoria> list = new ArrayList<>();
+		try {
+			Optional<Categoria> categoria = catergoriaDao.findById(id);
+			if(categoria.isPresent()) {
+				list.add(categoria.get());
+				response.getCategoriaResponse().setCategorias(list);
+			}
+			else {
+				log.error("Error en consultar categoria");
+				response.setMetadata("Respuesta no OK", "-1", "Categoría no encontrada");
+				return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.NOT_FOUND);
+			}
+			
+		} catch (Exception e) {
+			log.error("Error en consultar categoria");
+			response.setMetadata("Respuesta no OK", "-1", "Error al consultar categoría");
+			return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<CategoriaResponseRest>(response, HttpStatus.OK);
 	}
 
 }
