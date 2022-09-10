@@ -91,11 +91,44 @@ public class LibroServiceImp implements ILibroService{
 		} 
 		return new ResponseEntity<LibroResponseRest>(response, HttpStatus.OK);
 	}
-
+	@Transactional
 	@Override
 	public ResponseEntity<LibroResponseRest> actualizarLibro(Libro libro, Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		log.info("Iniciar método actualizarLibro()");
+		LibroResponseRest response = new LibroResponseRest();
+		List<Libro> lista = new ArrayList<>();
+		try {
+			Optional<Libro> libroAActualizar = libroDao.findById(id);
+			if(libroAActualizar.isPresent()) {
+				libroAActualizar.get().setNombre(libro.getNombre());
+				libroAActualizar.get().setAutor(libro.getAutor());
+				libroAActualizar.get().setCategoria(libro.getCategoria());
+				libroAActualizar.get().setSinopsis(libro.getSinopsis());
+				libroAActualizar.get().setEditorial(libro.getEditorial());
+				Libro libroActualizado = libroDao.save(libroAActualizar.get());
+				if(libroActualizado != null) {
+					response.setMetadata("Respuesta OK", "00", "Libro actualizado correctamente");
+					lista.add(libroActualizado);
+					response.getLibroResponse().setLibros(lista);
+				}
+				else {
+					log.error("Error en Actualizar el libro");
+					response.setMetadata("Respuesta no ok", "-1", "Libro no actualizado");
+					return new ResponseEntity<LibroResponseRest>(response, HttpStatus.BAD_REQUEST);
+				}	
+			}
+			else {
+				log.error("Error en actualizar libro");
+				response.setMetadata("Respuesta no ok", "-1", "Libro no actualizado");
+				return new ResponseEntity<LibroResponseRest>(response, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			log.error("Error en actualizar libro", e.getMessage());
+			e.getStackTrace();
+			response.setMetadata("Respuesta no Ok", "-1", "Libro no actualizado");
+			return new ResponseEntity<LibroResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<LibroResponseRest>(response, HttpStatus.OK);
 	}
 
 	@Override
