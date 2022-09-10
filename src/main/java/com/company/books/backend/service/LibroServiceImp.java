@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.company.books.backend.model.Libro;
 import com.company.books.backend.model.dao.ILibroDao;
 import com.company.books.backend.response.LibroResponseRest;
+import com.company.books.backend.response.ResponseRest;
 
 @Service
 public class LibroServiceImp implements ILibroService{
@@ -130,11 +131,20 @@ public class LibroServiceImp implements ILibroService{
 		}
 		return new ResponseEntity<LibroResponseRest>(response, HttpStatus.OK);
 	}
-
+	@Transactional
 	@Override
 	public ResponseEntity<LibroResponseRest> eliminarLibro(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		log.info("Inicio del método eliminar Libro");
+		LibroResponseRest response = new LibroResponseRest();
+		try {
+			libroDao.deleteById(id);
+			response.setMetadata("Respuesta ok", "00", "Respuesta exitosa, libro eliminado");
+		} catch (Exception e) {
+			e.getStackTrace();
+			response.setMetadata("Respuesta no ok", "-1", "Libro no eliminado");
+			return new ResponseEntity<LibroResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<LibroResponseRest>(response, HttpStatus.OK);
 	}
 
 }
