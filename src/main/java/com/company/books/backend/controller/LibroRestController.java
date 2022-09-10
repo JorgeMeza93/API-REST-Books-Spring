@@ -3,9 +3,13 @@ package com.company.books.backend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.company.books.backend.model.Libro;
 import com.company.books.backend.response.LibroResponseRest;
 import com.company.books.backend.service.ILibroService;
 
@@ -19,6 +23,16 @@ public class LibroRestController {
 	@GetMapping("/libros")
 	public ResponseEntity<LibroResponseRest> consultarLibros(){
 		ResponseEntity<LibroResponseRest> response = service.buscarLibro();
+		return response;
+	}
+	@GetMapping("/libros/{id}")
+	public ResponseEntity<LibroResponseRest> consultarLibroPorId(@PathVariable Long id){
+		ResponseEntity<LibroResponseRest> response = service.buscarLibroPorID(id);
+		return response;
+	}
+	@PostMapping("/libros")
+	public ResponseEntity<LibroResponseRest> crearLibroNuevo(@RequestBody Libro libro){
+		ResponseEntity<LibroResponseRest> response = service.crearLibro(libro);
 		return response;
 	}
 
