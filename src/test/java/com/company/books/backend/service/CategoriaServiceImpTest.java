@@ -28,7 +28,7 @@ public class CategoriaServiceImpTest {
 	 @BeforeEach
 	 public void init(){
 		 MockitoAnnotations.openMocks(this);
-		 this.buscarCategoriasTest();
+		 this.cargarCategorias();
 	 }
 	 @Test
 	 public void buscarCategoriasTest(){
